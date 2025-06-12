@@ -112,8 +112,9 @@ const generateCheckcode = (payload: Record<string, string>) => {
     .map((key) => `${key}=${encodeURIComponent(payload[key])}`)
     .join("&");
 
+  const secretKey = process.env.SECRET_KEY!;
   const hmac = crypto
-    .createHmac("sha1", "mys3cr3t")
+    .createHmac("sha1", secretKey)
     .update(sorted)
     .digest("hex")
     .toUpperCase();
@@ -121,7 +122,7 @@ const generateCheckcode = (payload: Record<string, string>) => {
 };
 
 // Fetch the currently authenticated user's data
-const fetchAuthenticatedUser = async (
+const getAuthenticateUser = async (
   access_token: string,
   apiuser: string,
   userId: string,
@@ -188,7 +189,7 @@ const main = async (): Promise<void> => {
   try {
     const users = await getUser();
     const { token, apiuser, userId, openId, operateId } = await getToken();
-    const authenticatedUser = await fetchAuthenticatedUser(
+    const authenticatedUser = await getAuthenticateUser(
       token,
       apiuser,
       userId,
